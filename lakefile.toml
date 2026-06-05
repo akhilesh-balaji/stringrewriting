@@ -1,0 +1,22 @@
+name = "StringRewriting"
+version = "0.1.0"
+defaultTargets = ["stringrewriting", "SRS"]
+
+[[lean_lib]]
+name = "StringRewriting"
+
+[[lean_lib]]
+name = "SRS"
+
+[[lean_exe]]
+name = "stringrewriting"
+root = "Main"
+
+[[require]]
+name = "cslib"
+scope = "leanprover"
+rev = "main"
+
+[[require]]
+name = "mathlib"
+scope = "leanprover-community"

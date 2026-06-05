@@ -8,6 +8,9 @@ name = "StringRewriting"
 [[lean_lib]]
 name = "SRS"
 
+[[lean_lib]]
+name = "Halt"
+
 [[lean_exe]]
 name = "stringrewriting"
 root = "Main"

@@ -6,6 +6,7 @@ structure SRS where
 
 namespace SRS
 
+/-- Stepping `u=l++lhs++r` to `v=l++rhs++r` using the rule `lhs ↦ rhs`. -/
 def step (s : SRS) (u v : List s.alphabet) : Prop :=
   ∃ (l r lhs rhs : List s.alphabet),
     (lhs, rhs) ∈ s.productions ∧
@@ -27,7 +28,7 @@ syntax term " ↦{" term "}" term : term
 macro_rules
   | `($u {$s}↦ $v) => `(SRS.reduces $s $u $v)
 
-def catToDog : SRS where
+private def catToDog : SRS where
   alphabet := Char
   productions := [
     ⟪"c"⟫ ↦ ⟪"d"⟫,
@@ -35,8 +36,8 @@ def catToDog : SRS where
     ⟪"t"⟫ ↦ ⟪"g"⟫,
   ]
 
-example : ⟪"cat"⟫ {catToDog}↦ ⟪"dog"⟫ := by
-  -- cat → dat → dot → dog
+private example : ⟪"cat"⟫ {catToDog}↦ ⟪"dog"⟫ := by
+  -- cat ↦ dat ↦ dot ↦ dog
   apply Relation.ReflTransGen.trans
   · apply Relation.ReflTransGen.single
     exact ⟨[], ⟪"at"⟫, ⟪"c"⟫, ⟪"d"⟫, List.mem_of_mem_head? rfl, rfl, rfl⟩

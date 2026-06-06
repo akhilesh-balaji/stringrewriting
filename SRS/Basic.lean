@@ -24,7 +24,8 @@ syntax term " ↦ " term : term
 macro_rules
   | `($lhs ↦ $rhs) => `(($lhs, $rhs))
 
-syntax term " ↦{" term "}" term : term
+/- syntax term " ↦{" term "}" term : term -/
+syntax term  "{" term "}↦ " term : term
 macro_rules
   | `($u {$s}↦ $v) => `(SRS.reduces $s $u $v)
 
@@ -46,6 +47,8 @@ private example : ⟪"cat"⟫ {catToDog}↦ ⟪"dog"⟫ := by
     exact ⟨⟪"d"⟫, ⟪"t"⟫, ⟪"a"⟫, ⟪"o"⟫, List.mem_cons.mpr (Or.inr List.mem_cons_self), rfl, rfl⟩
   apply Relation.ReflTransGen.single
   exact ⟨⟪"do"⟫, [], ⟪"t"⟫, ⟪"g"⟫, List.mem_cons.mpr (Or.inr (List.mem_cons.mpr (Or.inr (List.mem_singleton.mpr rfl)))), rfl, rfl⟩
+
+def HasSolution (s : SRS) (u v : List s.alphabet) : Prop := u {s}↦ v
 
 end SRS
 

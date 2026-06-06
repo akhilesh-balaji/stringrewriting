@@ -1,4 +1,5 @@
 import Cslib.Computability.Machines.SingleTapeTuring.Basic
+import Mathlib.Data.Nat.Bits
 
 variable {Symbol : Type} [Inhabited Symbol] [Fintype Symbol]
 
@@ -26,12 +27,38 @@ lemma encodeNat_zero : encodeNat 0 = [] := rfl
 
 @[simp]
 lemma encodeNat_succ (n : ℕ) :
-    encodeNat (n + 1) = false :: encodeNat n := by
-  simp [encodeNat, List.replicate_succ]
+    encodeNat (n + 1) = false :: encodeNat n := by simp [encodeNat, List.replicate_succ]
+
+def decodeNat (l : List Bool) : Option ℕ :=
+  if l.all (· == false) then some l.length
+  else none
+
+@[simp]
+lemma decodeNat_encodeNat (n : ℕ) : decodeNat (encodeNat n) = n := by
+  simp [decodeNat, encodeNat, List.all_replicate, List.length_replicate]
 
 /-- The binary string `w` is the binary number `[1w]_2 ∈ ℕ`. -/
 def enumeratedBinaryString (w : List Bool) : ℕ :=
   w.foldl (fun acc b => acc * 2 + if b then 1 else 0) 1
+
+def unenumeratedBinaryString (n : ℕ) : List Bool := ((Nat.bits n).reverse).tail
+
+private lemma foldl_eq (w : List Bool) (k : ℕ) :
+    w.foldl (fun acc b => acc * 2 + if b then 1 else 0) k =
+    k * 2 ^ w.length +
+      w.foldl (fun acc b => acc * 2 + if b then 1 else 0) 0 := by
+  induction w generalizing k with
+  | nil => simp
+  | cons hd tl ih =>
+    simp [List.foldl]
+    have ih' := ih (if hd then 1 else 0)
+    specialize ih (k * 2 + if hd then 1 else 0)
+    rw [ih, ih']
+    ring
+
+@[simp]
+lemma unenumeratedBinaryString_enumeratedBinaryString (w : List Bool) :
+    unenumeratedBinaryString (enumeratedBinaryString w) = w := by sorry
 
 noncomputable def symbolIdx [DecidableEq Symbol] (s : Option Symbol) : ℕ :=
   match s with
@@ -40,9 +67,9 @@ noncomputable def symbolIdx [DecidableEq Symbol] (s : Option Symbol) : ℕ :=
 
 def dirIdx (d : Option Dir) : ℕ :=
   match d with
-  | some Dir.left => 1
+  | some Dir.left  => 1
   | some Dir.right => 2
-  | none       => 3
+  | none           => 3
 
 def boolSymbolIdx (s : Option Bool) : ℕ :=
   match s with

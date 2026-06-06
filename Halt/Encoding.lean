@@ -6,7 +6,7 @@ open Turing SingleTapeTM
 
 namespace Halt.Encoding
 
-/- encodeTr transitions is of the form δ(qi, Xj ) = (qk, Xl, Dm), for some integers i, j , k, l, and
+/- From Hopcroft et al.'s textbook: δ(qi, Xj ) = (qk, Xl, Dm), for some integers i, j , k, l, and
 m. We shall code this rule by the string 0i 10j 10k 10l 10m. Notice that, since all of i, j , k, l,
 and m are at least one, there are no occurrences of two or more consecutive 1's within the code for
 a single transition. A code for the entire TM M consists of all the codes for the transitions, in
@@ -32,7 +32,6 @@ lemma encodeNat_succ (n : ℕ) :
 /-- The binary string `w` is the binary number `[1w]_2 ∈ ℕ`. -/
 def enumeratedBinaryString (w : List Bool) : ℕ :=
   w.foldl (fun acc b => acc * 2 + if b then 1 else 0) 1
-#eval enumeratedBinaryString []
 
 noncomputable def symbolIdx [DecidableEq Symbol] (s : Option Symbol) : ℕ :=
   match s with
@@ -80,7 +79,7 @@ noncomputable def encodeBoolTr (tm : SingleTapeTM Bool) [DecidableEq tm.State] :
   )
   List.intercalate [true, true] encoded
 
-noncomputable def encodeTM (tm : SingleTapeTM Bool) [DecidableEq tm.State] : List Bool :=
+noncomputable def encodeBoolTM (tm : SingleTapeTM Bool) [DecidableEq tm.State] : List Bool :=
   encodeNat (Fintype.card tm.State) ++ List.replicate 3 true ++ encodeBoolTr tm
 
 end Halt.Encoding

@@ -18,15 +18,6 @@ some s. X1 always will be the symbol 0, X2 will be 1, and X3 will be ⊔, the bl
 tape symbols can be assigned to the remaining integers arbitrarily. We shall refer to direction L as
 D1 and direction R as D2. -/
 
-structure ConventionalTM (Symbol : Type) [Inhabited Symbol] [Fintype Symbol] 
-    [DecidableEq Symbol] extends SingleTapeTM Symbol where
-  /-- The accepting state -/
-  qAccept : State
-  /-- X1: the '0' symbol -/
-  sym0 : Symbol
-  /-- X2: the '1' symbol -/
-  sym1 : Symbol
-
 def encodeNat (n : ℕ) : List Bool := List.replicate n false
 #eval encodeNat 3
 

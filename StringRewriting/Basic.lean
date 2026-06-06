@@ -28,8 +28,8 @@ This transition is represented by the production
 
 Applying this construction to every transition of M yields a set of productions P.
 
-The goal is for the rewriting system to transform W into W̃. Equivalently,
-there should be a derivation W = w_1 ··· w_k ⇒* w̃_1 ··· w̃_m q_h, where q_h ∈ F is a halting state. Thus, W ⇒* W̃ corresponds exactly to a halting computation of M.
+The goal is for the rewriting system to transform W into W'. Equivalently,
+there should be a derivation W = w_1 ··· w_k ⇒* w̃'_1 ··· w̃'_m q_h, where q_h ∈ F is a halting state. Thus, W ⇒* W̃' corresponds exactly to a halting computation of M.
 
 Therefore, if the string-rewriting instance has a solution, then M halts.
 Conversely, a halting computation of M yields a solution to the string-rewriting instance.
@@ -38,7 +38,7 @@ Since the Halting Problem is undecidable, and we have constructed a many-one
 reduction HALT_TM ≤M SR, it follows that String Rewriting is also undecidable.
 -/
 
-theorem srs_if_halt (s : SRS) (u v : List s.alphabet)
+theorem sr_if_halt (s : SRS) (u v : List s.alphabet)
     [Inhabited s.alphabet] [Fintype s.alphabet]
     (tm : SingleTapeTM s.alphabet) :
     Halts tm u → s.HasSolution u v := by

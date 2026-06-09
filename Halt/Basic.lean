@@ -1,8 +1,9 @@
 import Cslib.Computability.Machines.SingleTapeTuring.Basic
+import Halt.Encoding
 
 variable {Symbol : Type} [Inhabited Symbol] [Fintype Symbol]
 
-open Turing SingleTapeTM
+open Turing SingleTapeTM Halt.Encoding
 
 namespace Halt
 
@@ -31,10 +32,31 @@ theorem halts_iff_exists_n_haltsWithinTime (tm : SingleTapeTM Symbol)
 
 /- Define encodings first -/
 
-/-- **`IsHaltDecider D`** (pair form, "HALT_TM"): the single-tape TM
-`D` over `Bool`, when run on the encoded pair `(c, w)`, halts with
-output `[true]` if `c.toTM` halts on `w`, and `[false]` otherwise. -/
-def IsHaltDecider (D : SingleTapeTM Bool) : Prop := sorry
+/-- **`HaltDecidable Symbol`** holds iff some Bool-valued function on
+`SingleTapeTM Symbol × List Symbol` decides `Halts`. Vacuously true
+classically; included for contrast with the strict forms below. -/
+def HaltDecidable (Symbol : Type) [Inhabited Symbol] [Fintype Symbol] : Prop :=
+  ∃ decide : SingleTapeTM Symbol → List Symbol → Bool,
+    ∀ tm w, decide tm w = true ↔ Halts tm w
+
+def IsHaltDecider (D : SingleTapeTM Bool) : Prop :=
+  ∀ (tm : SingleTapeTM Bool) [DecidableEq tm.State] (w : List Bool),
+    (Halts tm w →
+      SingleTapeTM.Outputs D (encodePair (encodeBoolTM tm) w) [true]) ∧
+    (¬ Halts tm w →
+      SingleTapeTM.Outputs D (encodePair (encodeBoolTM tm) w) [false])
+
+def IsSelfHaltDecider (D : SingleTapeTM Bool) : Prop :=
+  ∀ (tm : SingleTapeTM Bool) [DecidableEq tm.State],
+    (Halts tm (encodeBoolTM tm) →
+      SingleTapeTM.Outputs D (encodeBoolTM tm) [true]) ∧
+    (¬ Halts tm (encodeBoolTM tm) →
+      SingleTapeTM.Outputs D (encodeBoolTM tm) [false])
+
+/-- **The Halting Problem is undecidable**: no `SingleTapeTM Bool` can
+decide the self-halt problem `K`. -/
+theorem halt_undecidable :
+    ¬ ∃ D : SingleTapeTM Bool, IsSelfHaltDecider D := by sorry
 
 end Halt
 

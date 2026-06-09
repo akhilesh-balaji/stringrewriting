@@ -19,12 +19,12 @@ instantaneous description (ID) of M is q_0 w_1 ··· w_k.
 A general ID has the form w_1 ··· w_{i-1} q w_i w_{i+1} ··· w_k, where the state symbol q marks the position of the head.
 
 We establish a correspondence between transitions of M and derivations in the string-rewriting system. Suppose
-    w_1 ··· w_{i-1} q w_i ··· w_{i+ℓ} ··· w_k ⊢ w_1 ··· w_{i-1} w̃_i ··· w̃_{i+ℓ'} p ··· w_k.
+    w_1 ··· w_{i-1} q w_i ··· w_{i+ℓ} ··· w_k ⊢ w_1 ··· w_{i-1} w̃'_i ··· w̃'_{i+ℓ'} p ··· w_k.
 
 If ℓ' < ℓ, we erase the excess symbols and rewrite the remainder, padding with blank symbols ⊔ as necessary. If ℓ < ℓ', we first erase the subsequent portion of the tape and then rewrite it farther to the right, inserting the required number of blanks.
 
 This transition is represented by the production
-    w_i ··· w_{i+ℓ} → w̃_i ··· w̃_{i+ℓ'}.
+    w_i ··· w_{i+ℓ} → w̃'_i ··· w̃'_{i+ℓ'}.
 
 Applying this construction to every transition of M yields a set of productions P.
 
@@ -35,7 +35,7 @@ Therefore, if the string-rewriting instance has a solution, then M halts.
 Conversely, a halting computation of M yields a solution to the string-rewriting instance.
 
 Since the Halting Problem is undecidable, and we have constructed a many-one
-reduction HALT_TM ≤M SR, it follows that String Rewriting is also undecidable.
+reduction HALT_TM ≤_M SR, it follows that String Rewriting is also undecidable.
 -/
 
 theorem sr_if_halt (s : SRS) (u v : List s.alphabet)

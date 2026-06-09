@@ -37,6 +37,9 @@ def decodeNat (l : List Bool) : Option ℕ :=
 lemma decodeNat_encodeNat (n : ℕ) : decodeNat (encodeNat n) = n := by
   simp [decodeNat, encodeNat, List.all_replicate, List.length_replicate]
 
+def encodePair (a b : List Bool) : List Bool :=
+  a ++ [true, true] ++ b
+
 /-- The binary string `w` is the binary number `[1w]_2 ∈ ℕ`. -/
 def enumeratedBinaryString (w : List Bool) : ℕ :=
   w.foldl (fun acc b => acc * 2 + if b then 1 else 0) 1
@@ -95,6 +98,9 @@ noncomputable def encodeBoolTransition (tm : SingleTapeTM Bool) [DecidableEq tm.
   encodeNat k ++ [true] ++
   encodeNat l ++ [true] ++
   encodeNat m
+
+noncomputable def decodeBoolTransition (w : List Bool) : SingleTapeTM Bool :=
+  sorry
 
 noncomputable def encodeBoolTr (tm : SingleTapeTM Bool) [DecidableEq tm.State] : List Bool :=
   let states := (@Finset.univ tm.State tm.stateFintype).toList

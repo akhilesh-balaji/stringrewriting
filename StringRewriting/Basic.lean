@@ -38,12 +38,14 @@ Since the Halting Problem is undecidable, and we have constructed a many-one
 reduction HALT_TM ≤_M SR, it follows that String Rewriting is also undecidable.
 -/
 
-/-- The TM's instantaneous description -/
-def TMID (tm : SingleTapeTM Bool) := Sum (Option tm.State) Bool
+/-- The type of the TM's instantaneous description -/
+def TMID (tm : SingleTapeTM Bool) : Type := Sum (Option tm.State) Bool
+
+/-- The TM's instanteneous description -/
 def TMCfgID (tm : SingleTapeTM Bool) (c : tm.Cfg) : List (TMID tm) :=
   c.BiTape.left.toList.filterMap  (·.map Sum.inr) ++
-  [Sum.inl c.state]                              ++
-  c.BiTape.head.toList.map Sum.inr                 ++
+  [Sum.inl c.state] ++
+  c.BiTape.head.toList.map Sum.inr ++
   c.BiTape.right.toList.filterMap (·.map Sum.inr)
 
 def isHaltID (tm : SingleTapeTM Bool) (v : List (TMID tm)) : Prop :=
@@ -94,12 +96,39 @@ noncomputable def Turing.SingleTapeTM.toSRS (tm : SingleTapeTM Bool) : SRS where
 
 lemma encodeInitID_eq_TMCfgID (tm : SingleTapeTM Bool) (u : List Bool) :
     encodeInitID tm u = TMCfgID tm (tm.initCfg u) := by
-  sorry
+  simp only [initCfg]
+  simp [encodeInitID, TMCfgID, Option.toList, BiTape.mk₁]
+  cases u with
+  | nil =>
+      simp [BiTape.nil]
+      exact Eq.symm List.singleton_append
+  | cons b rest =>
+      simp [StackTape.mapSome]
+      exact List.toList_toArray
 
 lemma srs_simulates_step (tm : SingleTapeTM Bool) (c c' : tm.Cfg) :
     tm.TransitionRelation c c' →
     (tm.toSRS).step (TMCfgID tm c) (TMCfgID tm c') := by
-  sorry -- case analysis on direction and q'opt, matches toSRS productions
+  /- simp [ TransitionRelation] -/
+  intro h
+  simp [SRS.step]
+  rw [SingleTapeTM.TransitionRelation] at h
+  cases hc : c with
+  | mk q tape =>
+    simp [SingleTapeTM.step] at h
+    subst hc
+    cases q with
+    | none =>
+      simp at h
+    | some q =>
+      injection h with hcfg
+      subst hcfg
+      set tr := tm.tr q tape.head
+      sorry
+        
+
+
+  /- sorry -- case analysis on direction and q'opt, matches toSRS productions -/
 
 lemma srs_simulates (tm : SingleTapeTM Bool) (c c' : tm.Cfg) :
     Relation.ReflTransGen tm.TransitionRelation c c' →
@@ -133,10 +162,11 @@ theorem sr_if_halt (tm : SingleTapeTM Bool) (u : List Bool) :
     encodeInitID_eq_TMCfgID tm u ▸ srs_simulates tm _ _ h_halts,
     isHaltID_none tm tape⟩
 
+/- optional -/
 theorem halts_if_sr (s : SRS) (u v : List s.alphabet)
     [Inhabited s.alphabet] [Fintype s.alphabet]
     [DecidableEq s.alphabet] :
-  s.HasSolution u v → Halts (s.toTM  u v) u := by sorry
+  s.HasSolution u v → Halts (s.toTM u v) u := by sorry
 
 theorem halts_iff_sr (tm : SingleTapeTM Bool) (u : List Bool) :
     Halts tm u ↔

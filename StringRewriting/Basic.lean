@@ -206,25 +206,34 @@ lemma srs_simulates_step (tm : SingleTapeTM Bool) (c c' : tm.Cfg) :
         Sum.inl (tm.tr q tape.head).2 :: optEnc tm (tm.tr q tape.head).1.symbol, ?_, ?_, ?_⟩
       · exact toSRS_mem_none tm q tape.head hmov
       · simp [List.append_assoc, List.cons_append, List.nil_append]
-        exact List.assoc_cons (srMap tm tape.left).reverse (Sum.inl (some q)) (optEnc tm tape.head) (srMap tm tape.right)
+        exact List.assoc_cons (srMap tm tape.left).reverse (Sum.inl (some q))
+          (optEnc tm tape.head) (srMap tm tape.right)
       · simp [BiTape.write, BiTape.optionMove, List.append_assoc]
         exact List.assoc_cons (srMap tm tape.left).reverse (Sum.inl (tm.tr q tape.head).2)
           (optEnc tm (tm.tr q tape.head).1.symbol) (srMap tm tape.right)
     | some dir =>
       cases dir with
       | right =>
-            refine ⟨(srMap tm tape.left).reverse, srMap tm tape.right, Sum.inl (some q) :: optEnc tm tape.head, optEnc tm (tm.tr q tape.head).1.symbol ++ ([Sum.inl (tm.tr q tape.head).2] : List (TMID tm)), ?_, ?_, ?_⟩
+            refine ⟨(srMap tm tape.left).reverse, srMap tm tape.right,
+              Sum.inl (some q) :: optEnc tm tape.head, optEnc tm (tm.tr q tape.head).1.symbol ++
+              ([Sum.inl (tm.tr q tape.head).2] : List (TMID tm)), ?_, ?_, ?_⟩
             · exact toSRS_mem_right tm q tape.head hmov
             · simp [List.append_assoc]
-              exact List.assoc_cons (srMap tm tape.left).reverse (Sum.inl (some q)) (optEnc tm tape.head) (srMap tm tape.right)
+              exact List.assoc_cons (srMap tm tape.left).reverse
+                (Sum.inl (some q)) (optEnc tm tape.head) (srMap tm tape.right)
             · simp only [BiTape.write, BiTape.optionMove, BiTape.move, BiTape.moveRight]
               simp [srMap_cons, List.reverse_append, List.append_assoc, optEnc]
-              refine turing_tape_step (srMap tm tape.left).reverse (List.map Sum.inr (tm.tr q tape.head).1.symbol.toList).reverse
-                (List.map Sum.inr (tm.tr q tape.head).1.symbol.toList) (List.map Sum.inr tape.right.head.toList)
-                (srMap tm tape.right.tail) (srMap tm tape.right) (Sum.inl (tm.tr q tape.head).2) (hrev (tm.tr q tape.head).1.symbol)
+              refine turing_tape_step (srMap tm tape.left).reverse
+                (List.map Sum.inr (tm.tr q tape.head).1.symbol.toList).reverse
+                (List.map Sum.inr (tm.tr q tape.head).1.symbol.toList)
+                  (List.map Sum.inr tape.right.head.toList)
+                (srMap tm tape.right.tail) (srMap tm tape.right)
+                  (Sum.inl (tm.tr q tape.head).2) (hrev (tm.tr q tape.head).1.symbol)
                 ?_
               · have h := optEnc_append_srMap_tail tm tape.right
-                rwa [show optEnc tm tape.right.head = List.map Sum.inr tape.right.head.toList from by cases tape.right.head <;> simp [optEnc]; exact Array.toList_empty; exact List.singleton_inj.mpr rfl] at h
+                rwa [show optEnc tm tape.right.head = List.map Sum.inr tape.right.head.toList from
+                  by cases tape.right.head <;> simp [optEnc]; exact Array.toList_empty;
+                      exact List.singleton_inj.mpr rfl] at h
       | left =>
         have hleft : (srMap tm tape.left).reverse
             = (srMap tm tape.left.tail).reverse ++ optEnc tm tape.left.head := by
@@ -238,10 +247,13 @@ lemma srs_simulates_step (tm : SingleTapeTM Bool) (c c' : tm.Cfg) :
             ?_, ?_, ?_⟩
           · exact toSRS_mem_left tm q tape.head cc hmov
           · rw [hleft, htl]; simp [List.append_assoc, optEnc]
-            exact List.assoc_match (srMap tm tape.left.tail).reverse (Sum.inr cc) (Sum.inl (some q)) (List.map Sum.inr tape.head.toList) (srMap tm tape.right)
+            exact List.assoc_match (srMap tm tape.left.tail).reverse (Sum.inr cc)
+              (Sum.inl (some q)) (List.map Sum.inr tape.head.toList) (srMap tm tape.right)
           · simp only [BiTape.write, BiTape.optionMove, BiTape.move, BiTape.moveLeft]
             rw [htl]; simp [optEnc, srMap_cons, List.append_assoc]
-            exact List.assoc_match (srMap tm tape.left.tail).reverse (Sum.inl (tm.tr q tape.head).2) (Sum.inr cc) (List.map Sum.inr (tm.tr q tape.head).1.symbol.toList) (srMap tm tape.right)
+            exact List.assoc_match (srMap tm tape.left.tail).reverse
+              (Sum.inl (tm.tr q tape.head).2) (Sum.inr cc) (List.map Sum.inr
+                (tm.tr q tape.head).1.symbol.toList) (srMap tm tape.right)
         | none =>
           refine ⟨(srMap tm tape.left.tail).reverse, srMap tm tape.right,
             Sum.inl (some q) :: optEnc tm tape.head,
@@ -249,10 +261,13 @@ lemma srs_simulates_step (tm : SingleTapeTM Bool) (c c' : tm.Cfg) :
             ?_, ?_, ?_⟩
           · exact toSRS_mem_left_edge tm q tape.head hmov
           · rw [hleft, htl]; simp [optEnc, List.append_assoc]
-            exact List.assoc_cons (srMap tm tape.left.tail).reverse (Sum.inl (some q)) (List.map Sum.inr tape.head.toList) (srMap tm tape.right)
+            exact List.assoc_cons (srMap tm tape.left.tail).reverse (Sum.inl (some q))
+              (List.map Sum.inr tape.head.toList) (srMap tm tape.right)
           · simp only [BiTape.write, BiTape.optionMove, BiTape.move, BiTape.moveLeft]
             rw [htl]; simp [optEnc, srMap_cons, List.append_assoc]
-            exact List.assoc_cons (srMap tm tape.left.tail).reverse (Sum.inl (tm.tr q tape.head).2) (List.map Sum.inr (tm.tr q tape.head).1.symbol.toList) (srMap tm tape.right)
+            exact List.assoc_cons (srMap tm tape.left.tail).reverse
+              (Sum.inl (tm.tr q tape.head).2) (List.map Sum.inr
+                (tm.tr q tape.head).1.symbol.toList) (srMap tm tape.right)
 
 lemma srs_simulates (tm : SingleTapeTM Bool) (c c' : tm.Cfg) :
     Relation.ReflTransGen tm.TransitionRelation c c' →
